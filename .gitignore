@@ -1,2 +1,4 @@
 Dataset/venv/
 Hate Detection Model/venv
+Hate Detection Model/train_transformer_h_files/checkpoint-20160/model.safetensors
+Hate Detection Model/train_transformer_h_files/checkpoint-20160/optimizer.pt
