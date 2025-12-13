@@ -2,13 +2,20 @@ import torch
 import re
 import emoji
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import os
 
 # ------------------------------------------
 # MODEL AND CHECKPOINT PATHS
 # ------------------------------------------
-CHECKPOINT_PATH = "../train_transformer_h_files/hate_model/checkpoint-20160"
-# Alternative: If you want to use the final saved model instead of checkpoint
-# MODEL_PATH = "../train_transformer_h_files/hate_model"
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Build path relative to this file's location
+# If this file is in: Hate_Detection_Model/final_model/predict_toxicity.py
+# Model is in: Hate_Detection_Model/train_transformer_h_files/checkpoint-20160
+MODEL_DIR = os.path.join(CURRENT_DIR, "..", "train_transformer_h_files", "checkpoint-20160")
+CHECKPOINT_PATH = os.path.abspath(MODEL_DIR)
+
+print(f"[INFO] Looking for model at: {CHECKPOINT_PATH}")
 
 def clean_text(text):
     """Clean text the same way as during training"""

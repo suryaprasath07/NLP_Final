@@ -1,6 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from hate_speech_detector import predict_toxicity
+
+import sys
+import os
+sys.path.append(os.path.abspath("../"))
+
+from Hate_Detection_Model.final_model.predict_toxicity import predict_toxicity
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend requests
@@ -146,7 +151,7 @@ def index():
         "message": "Toxicity Detection API",
         "endpoints": {
             "/api/health": "Health check",
-            "/api/predict/toxicity": "POST - Predict toxicity for multiple texts (body: {texts: []})",
+            "http://localhost:8001/api/predict/toxicity": "POST - Predict toxicity for multiple texts (body: {texts: []})",
             "/api/predict/toxicity/single": "POST - Predict toxicity for single text (body: {text: ''})"
         }
     })

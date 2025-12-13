@@ -169,6 +169,64 @@
             margin: 16px 0;
             color: #555;
             line-height: 1.6;
+            position: relative;
+            cursor: help;
+        }
+
+        .post-text:hover .toxicity-tooltip,
+        .comment-text:hover .toxicity-tooltip {
+            display: block;
+        }
+
+        .toxicity-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 5px;
+            pointer-events: none;
+        }
+
+        .toxicity-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .toxicity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .toxicity-toxic {
+            background: #fee;
+            color: #c33;
+        }
+
+        .toxicity-non-toxic {
+            background: #efe;
+            color: #3a3;
+        }
+
+        .analyzing-badge {
+            background: #fef6e0;
+            color: #996600;
         }
 
         .replies {
@@ -202,6 +260,8 @@
         .comment-text {
             font-size: 14px;
             color: #555;
+            position: relative;
+            cursor: help;
         }
 
         .nested-reply {
@@ -269,11 +329,110 @@
 
     <script>
         const API_URL = 'http://localhost:8000';
+        const TOXICITY_API_URL = 'http://localhost:8001';
         let currentSubreddit = '';
         let currentOffset = 0;
         let allUrls = [];
         let isLoading = false;
         let hasMorePosts = true;
+        let currentPosts = []; // Store current posts for toxicity analysis
+
+        async function analyzeToxicity(posts) {
+            // Collect all texts from posts and comments
+            const textsToAnalyze = [];
+            const textIndices = []; // Store indices to map results back
+            
+            posts.forEach((post, postIdx) => {
+                // Add post text
+                if (post.text && post.text.trim()) {
+                    textsToAnalyze.push(post.text);
+                    textIndices.push({ type: 'post', postIdx, text: post.text });
+                }
+                
+                // Add comment texts recursively
+                function collectComments(replies, depth = 0) {
+                    if (!replies) return;
+                    replies.forEach((reply, replyIdx) => {
+                        if (reply.text && reply.text.trim()) {
+                            textsToAnalyze.push(reply.text);
+                            textIndices.push({ 
+                                type: 'comment', 
+                                postIdx, 
+                                text: reply.text,
+                                depth 
+                            });
+                        }
+                        if (reply.replies) {
+                            collectComments(reply.replies, depth + 1);
+                        }
+                    });
+                }
+                
+                if (post.replies) {
+                    collectComments(post.replies);
+                }
+            });
+            
+            if (textsToAnalyze.length === 0) return;
+            
+            try {
+                // Call toxicity API
+                const response = await fetch(`${TOXICITY_API_URL}/api/predict/toxicity`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ texts: textsToAnalyze })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Map predictions back to texts
+                    const predictions = data.predictions;
+                    
+                    // Update DOM with toxicity info
+                    predictions.forEach((pred, idx) => {
+                        const textInfo = textIndices[idx];
+                        const elements = document.querySelectorAll('.post-text, .comment-text');
+                        
+                        elements.forEach(el => {
+                            if (el.textContent.trim() === textInfo.text.trim()) {
+                                // Add toxicity badge
+                                const badgeClass = pred.label === 'toxic' ? 'toxicity-toxic' : 'toxicity-non-toxic';
+                                const badge = `<span class="toxicity-badge ${badgeClass}">${pred.label}</span>`;
+                                
+                                // Add tooltip
+                                const tooltip = `
+                                    <div class="toxicity-tooltip">
+                                        ${pred.label.toUpperCase()}<br>
+                                        Confidence: ${(pred.confidence * 100).toFixed(1)}%<br>
+                                        Toxic: ${(pred.toxic_probability * 100).toFixed(1)}%
+                                    </div>
+                                `;
+                                
+                                // Add badge to parent if it doesn't exist
+                                const parent = el.parentElement;
+                                if (!parent.querySelector('.toxicity-badge')) {
+                                    const metaDiv = parent.querySelector('.post-meta, .comment-author');
+                                    if (metaDiv) {
+                                        metaDiv.innerHTML += badge;
+                                    }
+                                }
+                                
+                                // Add tooltip to text element
+                                if (!el.querySelector('.toxicity-tooltip')) {
+                                    el.innerHTML += tooltip;
+                                }
+                            }
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error analyzing toxicity:', error);
+                // Silently fail - don't disrupt user experience
+            }
+        }
 
         async function fetchData(isNewSearch = false) {
             const subreddit = document.getElementById('subredditInput').value.trim();
@@ -299,6 +458,7 @@
                 currentOffset = 0;
                 allUrls = [];
                 hasMorePosts = true;
+                currentPosts = [];
                 resultsDiv.innerHTML = '';
                 loadMoreDiv.style.display = 'none';
                 endMessageDiv.style.display = 'none';
@@ -318,8 +478,17 @@
 
                 displayResults(data, isNewSearch);
                 
-                // Check if there are more posts
+                // Store posts for toxicity analysis
                 if (data.posts && data.posts.length > 0) {
+                    if (isNewSearch) {
+                        currentPosts = data.posts;
+                    } else {
+                        currentPosts = currentPosts.concat(data.posts);
+                    }
+                    
+                    // Analyze toxicity after displaying
+                    await analyzeToxicity(data.posts);
+                    
                     currentOffset += data.posts.length;
                     loadMoreDiv.style.display = 'block';
                 } else if (currentOffset === 0) {
@@ -364,6 +533,11 @@
 
                 if (data.posts && data.posts.length > 0) {
                     appendResults(data);
+                    
+                    // Analyze toxicity for new posts
+                    await analyzeToxicity(data.posts);
+                    
+                    currentPosts = currentPosts.concat(data.posts);
                     currentOffset += data.posts.length;
                     loadMoreDiv.style.display = 'block';
                 } else {
