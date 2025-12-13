@@ -1,0 +1,2 @@
+Final Accuracy: 0.7625
+Final Loss: 2.3014
