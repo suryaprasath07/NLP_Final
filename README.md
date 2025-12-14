@@ -150,8 +150,8 @@ reddit-hate-speech-detection/
 │
 ├── dataset/
 │   ├── api.py                           # Reddit scraping API
-│   ├── data_requirements.txt            # Dependencies for data collection
-│   └── scraper.py                       # Reddit data collection logic
+│   ├── requirements.txt                 # Dependencies for data collection
+│   └── data.py                          # Reddit data collection logic
 │
 ├── index.html                           # Frontend interface
 └── README.md                            # This file
