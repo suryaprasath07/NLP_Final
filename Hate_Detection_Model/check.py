@@ -1,11 +1,8 @@
-# In your other Python file (e.g., your Reddit API)
 from final_model import predict_toxicity
 
-# Example 1: Predict single text
 result = predict_toxicity("I hate you!")
-print(result[0]['label'])  # Returns: 'toxic' or 'non-toxic'
+print(result[0]['label'])
 
-# Example 2: Predict multiple texts
 texts = [
     "Hello, nice to meet you!",
     "You're an idiot",

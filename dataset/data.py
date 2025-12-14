@@ -100,7 +100,6 @@ def fetch_reddit_post_data(subreddit, urls):
             data = child['data']
             body = data.get('body', "")
             author = data.get('author', "")
-            # Some replies can be empty or not exist
             replies_data = data.get('replies', {})
             nested_replies = []
             if isinstance(replies_data, dict):
@@ -119,19 +118,16 @@ def fetch_reddit_post_data(subreddit, urls):
         if not url.startswith(f"https://www.reddit.com/r/{subreddit}/comments/"):
             continue
 
-        # Add .json to get the JSON version of the post
         json_url = url.rstrip("/") + ".json"
         response = requests.get(json_url, headers=headers)
         response.raise_for_status()
         post_json = response.json()
 
-        # First object is post info
         post_data = post_json[0]['data']['children'][0]['data']
         topic = post_data.get('title', "")
         text = post_data.get('selftext', "")
         author = post_data.get('author', "")
 
-        # Second object is comments
         comments = post_json[1]['data']['children']
         replies = parse_replies(comments)
 
@@ -148,8 +144,8 @@ def fetch_reddit_post_data(subreddit, urls):
 
 def main():
     nltk.download('punkt_tab')
-    nltk.download('punkt')  # standard tokenizer
-    nltk.download('wordnet')  # for lemmatizer
+    nltk.download('punkt')
+    nltk.download('wordnet')
 
     subreddit = "science"
     urls = get_subreddit_urls(subreddit, limit=100, max_posts=300)

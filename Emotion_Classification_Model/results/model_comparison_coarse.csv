@@ -1,0 +1,6 @@
+model,macro_f1
+roberta-goemotions,0.7599524075389658
+our_coarse_distilbert,0.7349173551860838
+distilroberta,0.4635210468038467
+michelle,0.41170827131881027
+distilbert-emotion,0.2787140107115748

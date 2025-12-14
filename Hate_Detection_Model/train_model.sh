@@ -13,14 +13,11 @@
 module load gcc/11.3.0
 module load cuda/12.3.0
 
-# Change to the project directory
 cd /home/suryajk/NLP
 
-# If you have a local script to set environment (like ./venv/bin/local), source it
 unset PYTHONPATH
 source /home/suryajk/scratch.hpcintro/train_transformer_h_venv/bin/activate
 
-# Force venv packages first
 export PYTHONPATH=/home/suryajk/scratch.hpcintro/train_transformer_h_venv/lib/python3.10/site-packages:$PYTHONPATH
 
 /home/suryajk/scratch.hpcintro/train_transformer_h_venv/bin/accelerate launch \

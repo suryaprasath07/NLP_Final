@@ -1,0 +1,12 @@
+datasets>=2.12.0
+transformers>=4.30.0
+torch>=2.0.0
+sentencepiece
+huggingface-hub
+pandas
+tqdm
+emoji
+scikit-learn
+python-dotenv
+praw
+streamlit

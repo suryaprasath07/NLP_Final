@@ -15,7 +15,7 @@ from transformers import (
 import numpy as np
 
 # ------------------------------------------
-# LOCAL MODEL PATH (YOUR HPC DIRECTORY)
+# LOCAL MODEL PATH (HPC DIRECTORY)
 # ------------------------------------------
 LOCAL_MODEL_PATH = "/home/suryajk/scratch.hpcintro/train_transformer_h_files/distilbert_local"
 
@@ -101,7 +101,7 @@ def train_distilbert(df):
         logging_steps=50,
         learning_rate=2e-5,
         weight_decay=0.01,
-        eval_strategy="epoch",  # Enable evaluation during training
+        eval_strategy="epoch",
     )
     
     trainer = Trainer(
@@ -110,12 +110,11 @@ def train_distilbert(df):
         train_dataset=train_ds,
         eval_dataset=test_ds,
         tokenizer=tokenizer,
-        compute_metrics=compute_metrics,  # Add metrics computation
+        compute_metrics=compute_metrics,
     )
     
     trainer.train()
     
-    # Final evaluation with accuracy
     metrics = trainer.evaluate(eval_dataset=test_ds)
     print("\n" + "="*50)
     print("FINAL EVALUATION METRICS:")
@@ -142,9 +141,6 @@ def main():
     
     print("Training complete! Metrics saved.")
 
-# ------------------------------------------
-# LOAD TOKENIZER FROM LOCAL PATH (OFFLINE)
-# ------------------------------------------
 tokenizer = AutoTokenizer.from_pretrained(LOCAL_MODEL_PATH)
 
 if __name__ == "__main__":

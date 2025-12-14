@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reddit Data Viewer</title>
+    <title>Reddit Data Viewer - Toxicity & Emotion Analysis</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -34,8 +34,14 @@
 
         h1 {
             font-size: 28px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #ff4500;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
         }
 
         .search-box {
@@ -108,26 +114,6 @@
             margin: 20px 0;
         }
 
-        .load-more button {
-            padding: 12px 32px;
-            background: #ff4500;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .load-more button:hover {
-            background: #e63e00;
-        }
-
-        .load-more button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
         .error {
             background: #fee;
             color: #c33;
@@ -158,6 +144,10 @@
         .post-meta {
             color: #666;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .author {
@@ -169,64 +159,133 @@
             margin: 16px 0;
             color: #555;
             line-height: 1.6;
-            position: relative;
-            cursor: help;
         }
 
-        .post-text:hover .toxicity-tooltip,
-        .comment-text:hover .toxicity-tooltip {
-            display: block;
+        .analysis-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #ff4500;
         }
 
-        .toxicity-tooltip {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            white-space: nowrap;
-            z-index: 1000;
-            margin-bottom: 5px;
-            pointer-events: none;
+        .analysis-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
 
-        .toxicity-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: rgba(0, 0, 0, 0.9);
-        }
-
-        .toxicity-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
+        .metric-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
-            margin-left: 8px;
         }
 
         .toxicity-toxic {
             background: #fee;
             color: #c33;
+            border: 2px solid #fcc;
         }
 
         .toxicity-non-toxic {
             background: #efe;
             color: #3a3;
+            border: 2px solid #cfc;
         }
+
+        .emotion-primary {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 2px solid #90caf9;
+        }
+
+        .confidence-text {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+
+        .distribution-container {
+            margin-top: 12px;
+        }
+
+        .distribution-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .emotion-bar {
+            margin-bottom: 8px;
+        }
+
+        .emotion-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .emotion-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .emotion-percentage {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .emotion-bar-bg {
+            background: #e0e0e0;
+            border-radius: 8px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .emotion-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 10px;
+        }
+
+        .emotion-joy { background: linear-gradient(90deg, #ffd89b 0%, #19547b 100%); }
+        .emotion-neutral { background: linear-gradient(90deg, #bdc3c7 0%, #2c3e50 100%); }
+        .emotion-anger { background: linear-gradient(90deg, #eb3349 0%, #f45c43 100%); }
+        .emotion-surprise { background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%); }
+        .emotion-sadness { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
+        .emotion-fear { background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%); }
 
         .analyzing-badge {
             background: #fef6e0;
             color: #996600;
+            border: 2px solid #fce8b2;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 12px;
         }
 
         .replies {
@@ -244,8 +303,8 @@
 
         .comment {
             background: #f9f9f9;
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
             border-radius: 6px;
             border-left: 3px solid #ff4500;
         }
@@ -254,19 +313,18 @@
             font-weight: 600;
             color: #ff4500;
             font-size: 14px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .comment-text {
             font-size: 14px;
             color: #555;
-            position: relative;
-            cursor: help;
+            margin-bottom: 8px;
         }
 
         .nested-reply {
             margin-left: 20px;
-            margin-top: 8px;
+            margin-top: 12px;
             padding-left: 12px;
             border-left: 2px solid #ddd;
         }
@@ -291,12 +349,58 @@
             color: #666;
             font-style: italic;
         }
+
+        .expand-button {
+            background: none;
+            border: none;
+            color: #ff4500;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px 8px;
+            text-decoration: underline;
+            margin-top: 8px;
+        }
+
+        .expand-button:hover {
+            background: none;
+            color: #e63e00;
+        }
+
+        .distribution-collapsed {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .distribution-expanded {
+            max-height: 500px;
+            transition: max-height 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            .post {
+                padding: 16px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Reddit Data Viewer</h1>
+            <h1>🔍 Reddit Data Viewer</h1>
+            <div class="subtitle">Real-time Toxicity & Emotion Analysis with Distribution</div>
             <div class="search-box">
                 <input 
                     type="text" 
@@ -311,7 +415,7 @@
         <div id="error" class="error" style="display: none;"></div>
         <div id="loading" class="loading" style="display: none;">
             <div class="spinner"></div>
-            <div class="loading-text">Loading posts...</div>
+            <div class="loading-text">Loading posts and analyzing content...</div>
         </div>
         <div id="stats" class="stats" style="display: none;"></div>
         <div id="results"></div>
@@ -327,346 +431,6 @@
         </div>
     </div>
 
-    <script>
-        const API_URL = 'http://localhost:8000';
-        const TOXICITY_API_URL = 'http://localhost:8001';
-        let currentSubreddit = '';
-        let currentOffset = 0;
-        let allUrls = [];
-        let isLoading = false;
-        let hasMorePosts = true;
-        let currentPosts = []; // Store current posts for toxicity analysis
-
-        async function analyzeToxicity(posts) {
-            // Collect all texts from posts and comments
-            const textsToAnalyze = [];
-            const textIndices = []; // Store indices to map results back
-            
-            posts.forEach((post, postIdx) => {
-                // Add post text
-                if (post.text && post.text.trim()) {
-                    textsToAnalyze.push(post.text);
-                    textIndices.push({ type: 'post', postIdx, text: post.text });
-                }
-                
-                // Add comment texts recursively
-                function collectComments(replies, depth = 0) {
-                    if (!replies) return;
-                    replies.forEach((reply, replyIdx) => {
-                        if (reply.text && reply.text.trim()) {
-                            textsToAnalyze.push(reply.text);
-                            textIndices.push({ 
-                                type: 'comment', 
-                                postIdx, 
-                                text: reply.text,
-                                depth 
-                            });
-                        }
-                        if (reply.replies) {
-                            collectComments(reply.replies, depth + 1);
-                        }
-                    });
-                }
-                
-                if (post.replies) {
-                    collectComments(post.replies);
-                }
-            });
-            
-            if (textsToAnalyze.length === 0) return;
-            
-            try {
-                // Call toxicity API
-                const response = await fetch(`${TOXICITY_API_URL}/api/predict/toxicity`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ texts: textsToAnalyze })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Map predictions back to texts
-                    const predictions = data.predictions;
-                    
-                    // Update DOM with toxicity info
-                    predictions.forEach((pred, idx) => {
-                        const textInfo = textIndices[idx];
-                        const elements = document.querySelectorAll('.post-text, .comment-text');
-                        
-                        elements.forEach(el => {
-                            if (el.textContent.trim() === textInfo.text.trim()) {
-                                // Add toxicity badge
-                                const badgeClass = pred.label === 'toxic' ? 'toxicity-toxic' : 'toxicity-non-toxic';
-                                const badge = `<span class="toxicity-badge ${badgeClass}">${pred.label}</span>`;
-                                
-                                // Add tooltip
-                                const tooltip = `
-                                    <div class="toxicity-tooltip">
-                                        ${pred.label.toUpperCase()}<br>
-                                        Confidence: ${(pred.confidence * 100).toFixed(1)}%<br>
-                                        Toxic: ${(pred.toxic_probability * 100).toFixed(1)}%
-                                    </div>
-                                `;
-                                
-                                // Add badge to parent if it doesn't exist
-                                const parent = el.parentElement;
-                                if (!parent.querySelector('.toxicity-badge')) {
-                                    const metaDiv = parent.querySelector('.post-meta, .comment-author');
-                                    if (metaDiv) {
-                                        metaDiv.innerHTML += badge;
-                                    }
-                                }
-                                
-                                // Add tooltip to text element
-                                if (!el.querySelector('.toxicity-tooltip')) {
-                                    el.innerHTML += tooltip;
-                                }
-                            }
-                        });
-                    });
-                }
-            } catch (error) {
-                console.error('Error analyzing toxicity:', error);
-                // Silently fail - don't disrupt user experience
-            }
-        }
-
-        async function fetchData(isNewSearch = false) {
-            const subreddit = document.getElementById('subredditInput').value.trim();
-            const resultsDiv = document.getElementById('results');
-            const loadingDiv = document.getElementById('loading');
-            const errorDiv = document.getElementById('error');
-            const statsDiv = document.getElementById('stats');
-            const searchBtn = document.getElementById('searchBtn');
-            const loadMoreDiv = document.getElementById('loadMore');
-            const endMessageDiv = document.getElementById('endMessage');
-
-            if (!subreddit) {
-                showError('Please enter a subreddit name');
-                return;
-            }
-
-            if (isLoading) return;
-            isLoading = true;
-
-            // If new search, reset everything
-            if (isNewSearch) {
-                currentSubreddit = subreddit;
-                currentOffset = 0;
-                allUrls = [];
-                hasMorePosts = true;
-                currentPosts = [];
-                resultsDiv.innerHTML = '';
-                loadMoreDiv.style.display = 'none';
-                endMessageDiv.style.display = 'none';
-            }
-
-            errorDiv.style.display = 'none';
-            loadingDiv.style.display = 'block';
-            searchBtn.disabled = true;
-
-            try {
-                const response = await fetch(`${API_URL}/api/subreddit/${subreddit}?max_posts=20&offset=${currentOffset}`);
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to fetch data');
-                }
-
-                displayResults(data, isNewSearch);
-                
-                // Store posts for toxicity analysis
-                if (data.posts && data.posts.length > 0) {
-                    if (isNewSearch) {
-                        currentPosts = data.posts;
-                    } else {
-                        currentPosts = currentPosts.concat(data.posts);
-                    }
-                    
-                    // Analyze toxicity after displaying
-                    await analyzeToxicity(data.posts);
-                    
-                    currentOffset += data.posts.length;
-                    loadMoreDiv.style.display = 'block';
-                } else if (currentOffset === 0) {
-                    resultsDiv.innerHTML = '<div class="no-results">No posts found for this subreddit.</div>';
-                    hasMorePosts = false;
-                } else {
-                    hasMorePosts = false;
-                    loadMoreDiv.style.display = 'none';
-                    endMessageDiv.style.display = 'block';
-                }
-
-            } catch (error) {
-                showError(error.message);
-                hasMorePosts = false;
-            } finally {
-                loadingDiv.style.display = 'none';
-                searchBtn.disabled = false;
-                isLoading = false;
-            }
-        }
-
-        async function loadMorePosts() {
-            if (!hasMorePosts || isLoading) return;
-            
-            isLoading = true;
-            const loadMoreBtn = document.querySelector('#loadMore button');
-            const loadingMoreDiv = document.getElementById('loadingMore');
-            const loadMoreDiv = document.getElementById('loadMore');
-            const endMessageDiv = document.getElementById('endMessage');
-            
-            loadMoreBtn.disabled = true;
-            loadMoreDiv.style.display = 'none';
-            loadingMoreDiv.style.display = 'block';
-
-            try {
-                const response = await fetch(`${API_URL}/api/subreddit/${currentSubreddit}?max_posts=20&offset=${currentOffset}`);
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to fetch more posts');
-                }
-
-                if (data.posts && data.posts.length > 0) {
-                    appendResults(data);
-                    
-                    // Analyze toxicity for new posts
-                    await analyzeToxicity(data.posts);
-                    
-                    currentPosts = currentPosts.concat(data.posts);
-                    currentOffset += data.posts.length;
-                    loadMoreDiv.style.display = 'block';
-                } else {
-                    hasMorePosts = false;
-                    endMessageDiv.style.display = 'block';
-                }
-
-            } catch (error) {
-                showError('Failed to load more posts: ' + error.message);
-                hasMorePosts = false;
-            } finally {
-                loadingMoreDiv.style.display = 'none';
-                loadMoreBtn.disabled = false;
-                isLoading = false;
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-
-        function displayResults(data, isNewSearch) {
-            const resultsDiv = document.getElementById('results');
-            const statsDiv = document.getElementById('stats');
-
-            if (!data.posts || data.posts.length === 0) {
-                if (isNewSearch) {
-                    resultsDiv.innerHTML = '<div class="no-results">No posts found for this subreddit.</div>';
-                }
-                return;
-            }
-
-            // Show stats
-            statsDiv.innerHTML = `<strong>r/${data.subreddit}</strong> - ${currentOffset + data.posts.length} posts loaded`;
-            statsDiv.style.display = 'block';
-
-            // Display posts
-            const postsHtml = data.posts.map(post => `
-                <div class="post">
-                    <div class="post-header">
-                        <div class="post-title">${escapeHtml(post.topic || 'No title')}</div>
-                        <div class="post-meta">
-                            Posted by <span class="author">u/${escapeHtml(post.author)}</span>
-                        </div>
-                    </div>
-                    ${post.text ? `<div class="post-text">${escapeHtml(post.text)}</div>` : ''}
-                    ${post.replies && post.replies.length > 0 ? renderReplies(post.replies) : ''}
-                </div>
-            `).join('');
-
-            if (isNewSearch) {
-                resultsDiv.innerHTML = postsHtml;
-            } else {
-                resultsDiv.innerHTML += postsHtml;
-            }
-        }
-
-        function appendResults(data) {
-            const resultsDiv = document.getElementById('results');
-            const statsDiv = document.getElementById('stats');
-
-            if (!data.posts || data.posts.length === 0) {
-                return;
-            }
-
-            // Update stats
-            statsDiv.innerHTML = `<strong>r/${data.subreddit}</strong> - ${currentOffset + data.posts.length} posts loaded`;
-
-            // Append new posts
-            const postsHtml = data.posts.map(post => `
-                <div class="post">
-                    <div class="post-header">
-                        <div class="post-title">${escapeHtml(post.topic || 'No title')}</div>
-                        <div class="post-meta">
-                            Posted by <span class="author">u/${escapeHtml(post.author)}</span>
-                        </div>
-                    </div>
-                    ${post.text ? `<div class="post-text">${escapeHtml(post.text)}</div>` : ''}
-                    ${post.replies && post.replies.length > 0 ? renderReplies(post.replies) : ''}
-                </div>
-            `).join('');
-
-            resultsDiv.innerHTML += postsHtml;
-        }
-
-        function renderReplies(replies, isNested = false) {
-            if (!replies || replies.length === 0) return '';
-
-            const containerClass = isNested ? 'nested-reply' : 'replies';
-            const header = !isNested ? '<div class="replies-header">Comments:</div>' : '';
-
-            return `
-                <div class="${containerClass}">
-                    ${header}
-                    ${replies.map(reply => `
-                        <div class="comment">
-                            <div class="comment-author">u/${escapeHtml(reply.author)}</div>
-                            <div class="comment-text">${escapeHtml(reply.text || '')}</div>
-                            ${reply.replies && reply.replies.length > 0 ? renderReplies(reply.replies, true) : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // Optional: Auto-load on scroll to bottom
-        let autoLoadEnabled = false; // Set to true if you want auto-load on scroll
-
-        if (autoLoadEnabled) {
-            window.addEventListener('scroll', () => {
-                if (isLoading || !hasMorePosts) return;
-
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const scrollHeight = document.documentElement.scrollHeight;
-                const clientHeight = document.documentElement.clientHeight;
-
-                if (scrollTop + clientHeight >= scrollHeight - 100) {
-                    loadMorePosts();
-                }
-            });
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

@@ -4,14 +4,8 @@ import emoji
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import os
 
-# ------------------------------------------
-# MODEL AND CHECKPOINT PATHS
-# ------------------------------------------
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Build path relative to this file's location
-# If this file is in: Hate_Detection_Model/final_model/predict_toxicity.py
-# Model is in: Hate_Detection_Model/train_transformer_h_files/checkpoint-20160
 MODEL_DIR = os.path.join(CURRENT_DIR, "..", "train_transformer_h_files", "checkpoint-20160")
 CHECKPOINT_PATH = os.path.abspath(MODEL_DIR)
 
@@ -43,10 +37,8 @@ def load_model(checkpoint_path):
     # Load model
     model = AutoModelForSequenceClassification.from_pretrained(checkpoint_path)
     
-    # Set model to evaluation mode
     model.eval()
     
-    # Move to GPU if available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     
@@ -136,9 +128,6 @@ def predict_batch(texts, model, tokenizer, device, batch_size=16):
     
     return results
 
-# ------------------------------------------
-# GLOBAL MODEL CACHE (loaded once)
-# ------------------------------------------
 _model = None
 _tokenizer = None
 _device = None
@@ -173,14 +162,10 @@ def predict_toxicity(texts, batch_size=16):
         for result in results:
             print(f"{result['text']}: {result['label']} ({result['confidence']:.2f})")
     """
-    # Handle single string input
     if isinstance(texts, str):
         texts = [texts]
     
-    # Load model (cached after first call)
     model, tokenizer, device = get_model()
-    
-    # Get predictions
     results = predict_batch(texts, model, tokenizer, device, batch_size)
     
     return results
