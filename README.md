@@ -81,6 +81,7 @@ cd NLP_Final
 
 The frontend is a static HTML/CSS/JavaScript application with no dependencies.
 ```bash
+Open Terminal at Frontend
 python3 -m http.server 3000
 ```
 
@@ -91,14 +92,16 @@ The interface will be available at: `http://localhost:3000`
 The Model API handles toxicity predictions using the fine-tuned DistilBERT model.
 ```bash
 # Create and activate virtual environment
+# Open Terminal at Model_API
+
 python3 -m venv model-venv
 source model-venv/bin/activate  # On Windows: model-venv\Scripts\activate
 
 # Install dependencies
-pip install -r Hate_Detection_Model/final_model/final_requirements.txt
+pip install -r requirements.txt
 
 # Start the API
-python Model_API/api.py
+python3 api.py
 ```
 
 The Model API will run on: `http://localhost:8001`
@@ -107,15 +110,17 @@ The Model API will run on: `http://localhost:8001`
 
 The Data API fetches posts and comments from Reddit.
 ```bash
+# Open Terminal at Model_API
 # Create and activate virtual environment (in a new terminal)
+
 python3 -m venv data-venv
 source data-venv/bin/activate  # On Windows: data-venv\Scripts\activate
 
 # Install dependencies
-pip install -r dataset/data_requirements.txt
+pip install -r requirements.txt
 
 # Start the API
-python dataset/api.py
+python3 api.py
 ```
 
 The Data API will run on: `http://localhost:8000`
@@ -146,7 +151,8 @@ reddit-hate-speech-detection/
 │       └── checkpoint-20160/            # Fine-tuned model weights
 │
 ├── Model_API/
-│   └── api.py                           # Toxicity detection API
+│   ├── api.py                           # Toxicity detection API
+|   ├── requirements.txt
 │
 ├── dataset/
 │   ├── api.py                           # Reddit scraping API
