@@ -70,6 +70,7 @@ Contains all scripts for:
 - Python 3.8 or higher
 - Git
 - Internet connection (for Reddit API access)
+- Git LFS
 
 ### Step 1: Clone the Repository
 ```bash
